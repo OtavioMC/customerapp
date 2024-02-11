@@ -14,5 +14,9 @@
             "email": "mendoncacostaotavio@gmail.com"
         }
     ],
-    "require": {}
+    "require-dev": {
+        "kahlan/kahlan": "^5.2",
+        "captainhook/captainhook": "^5.21",
+        "robmorgan/phinx": "^0.16.0"
+    }
 }
