@@ -18,5 +18,14 @@
         "kahlan/kahlan": "^5.2",
         "captainhook/captainhook": "^5.21",
         "robmorgan/phinx": "^0.16.0"
+    },
+    "scripts": {
+        "test": "kahlan",
+        "captainhook" : "php vendor/bin/captainhook"
+    },
+    "config": {
+        "allow-plugins": {
+            "captainhook/plugin-composer": true
+        }
     }
 }
