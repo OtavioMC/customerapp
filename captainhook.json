@@ -7,13 +7,16 @@
     },
     "pre-commit": {
     "enabled": true,
-    "actions": [ { "action": "composer test" } ]
+    "actions": [ 
+        { "action": "composer test" },  
+        { "action": "composer analyze" }  
+    ]
     },
     "pre-push": {
     "enabled": true,
     "actions": [
-    { "action": "composer check" },
-    { "action": "composer outdated" }
+        { "action": "composer check" },
+        { "action": "composer outdated" }
     ]
     }
     }

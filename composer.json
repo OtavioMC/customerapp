@@ -17,11 +17,12 @@
     "require-dev": {
         "kahlan/kahlan": "^5.2",
         "captainhook/captainhook": "^5.21",
-        "robmorgan/phinx": "^0.16.0"
+        "robmorgan/phinx": "^0.16.0",
+        "phpstan/phpstan": "^1.10"
     },
     "scripts": {
         "test": "kahlan",
-        "captainhook" : "php vendor/bin/captainhook"
+        "analyze" : "php vendor/bin/phpstan analyse"
     },
     "config": {
         "allow-plugins": {
