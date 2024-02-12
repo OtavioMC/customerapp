@@ -5,7 +5,8 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "OtavioMC\\Customerapp\\": "src/"
+            "customerapp\\src\\": "src/",
+            "Dotenv\\": ".env"
         }
     },
     "authors": [
@@ -28,5 +29,8 @@
         "allow-plugins": {
             "captainhook/plugin-composer": true
         }
+    },
+    "require": {
+        "vlucas/phpdotenv": "^5.6"
     }
 }
