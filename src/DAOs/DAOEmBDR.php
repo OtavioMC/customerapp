@@ -12,7 +12,7 @@
         protected $nomeTabela;
 
         public function __construct() {
-            $this->bancoDados = new BancoDadosRelacional();
+            $this->bancoDados = BancoDadosRelacional::getInstancia();
         }
 
         public function buscarPorId($id) {

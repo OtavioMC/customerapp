@@ -9,18 +9,26 @@
 
     class BancoDadosRelacional implements BancoDados{
 
+        private static $instancia;
         private $host = "";
         private $nomeBanco = "";
         private $usuario = "";
         private $senha = "";
         private $conexaoPDO;
 
-        public function __construct() {
+        private function __construct() {
             $this->host = $_ENV['DB_HOST'];
             $this->nomeBanco = $_ENV['DB_NAME'];
             $this->usuario = $_ENV['DB_USER'];
             $this->senha = $_ENV['DB_PASSWORD'];
             $this->conexaoPDO = $this->conectar();
+        }
+
+        public static function getInstancia() {
+            if (self::$instancia === null) {
+                self::$instancia = new self();
+            }
+            return self::$instancia;
         }
 
         private function conectar() {
