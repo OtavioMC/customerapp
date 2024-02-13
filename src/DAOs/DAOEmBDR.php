@@ -1,6 +1,6 @@
 <?php
 
-    namespace customerapp\src\daos;
+    namespace customerapp\src\DAOs;
 
     use customerapp\src\classes\BancoDadosRelacional;
     use customerapp\src\interfaces\DAO;
