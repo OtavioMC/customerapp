@@ -1,19 +1,20 @@
 <?php
     namespace customerapp\src\classes;
+
+    use BDRException;
     use \PDO;
     use \PDOException;
+    use customerapp\src\interfaces\BancoDados;
+    require_once __DIR__ . "/../../config.php";
 
-    $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ .  '/../../');
-    $dotenv->load();
-
-    class BancoDados {
+    class BancoDadosRelacional implements BancoDados{
 
         private $host = "";
         private $nomeBanco = "";
         private $usuario = "";
         private $senha = "";
         private $conexaoPDO;
-    
+
         public function __construct() {
             $this->host = $_ENV['DB_HOST'];
             $this->nomeBanco = $_ENV['DB_NAME'];
@@ -21,62 +22,68 @@
             $this->senha = $_ENV['DB_PASSWORD'];
             $this->conexaoPDO = $this->conectar();
         }
-    
+
         private function conectar() {
             $this->conexaoPDO = null;
-    
+
             try {
                 $this->conexaoPDO = new PDO(
                     "mysql:host={$this->host};dbname={$this->nomeBanco}",
                     $this->usuario,
                     $this->senha
                 );
-    
+
                 $this->conexaoPDO->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             } catch (PDOException $e) {
-                echo 'Erro de conexão: ' . $e->getMessage();
-                throw $e;
-
+                $mensagemErro =  'Erro de conexão: ' . $e->getMessage();
+                throw new BDRException($mensagemErro);
                 //TODO: Criar e manter salvo log de erros no BD posteriormente.
             }
-    
+
             return $this->conexaoPDO;
         }
-    
+
         public function executar($sql, $parametros = []) {
             $stmt = $this->conexaoPDO->prepare($sql);
             $stmt->execute($parametros);
             return $stmt;
         }
-    
-        public function selecionar($sql, $parametros = []) {
+
+        public function buscar($sql, $parametros = []) {
             $stmt = $this->executar($sql, $parametros);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
-    
+
         public function inserir($sql, $parametros = []) {
             $stmt = $this->executar($sql, $parametros);
             return $this->conexaoPDO->lastInsertId();
         }
-    
+
         public function atualizar($sql, $parametros = []) {
             $stmt = $this->executar($sql, $parametros);
             return $stmt->rowCount();
         }
-    
+
         public function excluir($sql, $parametros = []) {
             $stmt = $this->executar($sql, $parametros);
             return $stmt->rowCount();
         }
-    
+
+        public function existe($sql, $parametros) {
+            $stmt = $this->conexaoPDO->prepare($sql);
+            $stmt->execute($parametros);
+
+            return $stmt->rowCount() > 0;
+        }
+
         public function iniciarTransacao() {
             $this->conexaoPDO->beginTransaction();
         }
-    
+
         public function finalizarTransacao() {
             $this->conexaoPDO->commit();
         }
-    
+
         public function desfazerTransacao() {
             $this->conexaoPDO->rollBack();
         }
