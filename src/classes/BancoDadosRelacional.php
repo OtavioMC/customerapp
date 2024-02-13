@@ -53,33 +53,33 @@
             return $this->conexaoPDO;
         }
 
-        public function executar($sql, $parametros = []) {
+        public function executar( string $sql,  array $parametros = []) {
             $stmt = $this->conexaoPDO->prepare($sql);
             $stmt->execute($parametros);
             return $stmt;
         }
 
-        public function buscar($sql, $parametros = []) {
+        public function buscar( string $sql, array $parametros = [] ) {
             $stmt = $this->executar($sql, $parametros);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
-        public function inserir($sql, $parametros = []) {
+        public function inserir( string $sql, array $parametros = [] ) {
             $stmt = $this->executar($sql, $parametros);
             return $this->conexaoPDO->lastInsertId();
         }
 
-        public function atualizar($sql, $parametros = []) {
+        public function atualizar( string $sql,  array $parametros = [] ) {
             $stmt = $this->executar($sql, $parametros);
             return $stmt->rowCount();
         }
 
-        public function excluir($sql, $parametros = []) {
+        public function excluir( string $sql, array $parametros = [] ) {
             $stmt = $this->executar($sql, $parametros);
             return $stmt->rowCount();
         }
 
-        public function existe($sql, $parametros) {
+        public function existe( string $sql,  array $parametros ) {
             $stmt = $this->conexaoPDO->prepare($sql);
             $stmt->execute($parametros);
 
@@ -96,5 +96,9 @@
 
         public function desfazerTransacao() {
             $this->conexaoPDO->rollBack();
+        }
+
+        public function emTransacao(){
+            return $this->conexaoPDO->inTransaction();
         }
     }
