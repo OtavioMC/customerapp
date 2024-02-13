@@ -5,9 +5,11 @@
     use \PDO;
     use \PDOException;
     use customerapp\src\interfaces\BancoDados;
+    use customerapp\src\interfaces\Singleton;
+
     require_once __DIR__ . "/../../config.php";
 
-    class BancoDadosRelacional implements BancoDados{
+    class BancoDadosRelacional implements BancoDados, Singleton{
 
         private static $instancia;
         private $host = "";

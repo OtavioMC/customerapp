@@ -4,16 +4,19 @@
 
     use customerapp\src\classes\BancoDadosRelacional;
     use customerapp\src\interfaces\DAO;
+    use customerapp\src\interfaces\Singleton;
     use DAOException;
 
-    abstract class DAOEmBDR implements DAO {
+    abstract class DAOEmBDR implements DAO, Singleton {
 
         protected $bancoDados;
         protected $nomeTabela;
 
-        public function __construct() {
+        private function __construct() {
             $this->bancoDados = BancoDadosRelacional::getInstancia();
         }
+
+        abstract public static function getInstancia();
 
         public function buscarPorId($id) {
             $sql = "SELECT * FROM {$this->nomeTabela} WHERE id = :id";
