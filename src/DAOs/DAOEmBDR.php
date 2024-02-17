@@ -5,12 +5,12 @@
     use customerapp\src\classes\BancoDadosRelacional;
     use customerapp\src\interfaces\DAO;
     use customerapp\src\interfaces\Singleton;
-    use DAOException;
+    use customerapp\src\exceptions\DAOException;
 
     abstract class DAOEmBDR implements DAO, Singleton {
 
-        protected $bancoDados;
-        protected $nomeTabela;
+        protected ?BancoDadosRelacional $bancoDados = null;
+        protected string $nomeTabela = "";
 
         protected function __construct() {
             $this->bancoDados = BancoDadosRelacional::getInstancia();
@@ -21,7 +21,12 @@
         public function buscarPorId( int $id) {
             $sql = "SELECT * FROM {$this->nomeTabela} WHERE id = :id";
             $parametros['id'] = $id;
-            return $this->transformarEmObjeto( array_shift($this->bancoDados->buscar($sql, $parametros)) );
+            $dados = $this->bancoDados->buscar($sql, $parametros);
+            if( ! empty( $dados ) ){
+                return $this->transformarEmObjeto( array_shift($dados) );
+            }else{
+                throw new DAOException("O {$this->nomeTabela} não foi em encontrado. Id: " . $id);
+            }
         }
 
         public function buscarTodos( array $parametros = [], int $pagina = 1, int $itensPorPagina = null ) {
@@ -45,7 +50,7 @@
         }
 
         public function existeComId( int $id ){
-            $sql = "SELECT id FROM {$this->nomeTabela} WHERE id = ?";
+            $sql = "SELECT id FROM {$this->nomeTabela} WHERE id = :id";
             $parametros['id'] = $id;
             return $this->bancoDados->existe($sql, $parametros);
         }
@@ -67,7 +72,7 @@
                         $this->bancoDados->finalizarTransacao();
                     }
                     return $retorno;
-                }catch( \Exception $e ){
+                }catch( \Exception | DAOException $e ){
                     if( $iniciouTransacao ){
                         $this->bancoDados->desfazerTransacao();
                     }
@@ -82,13 +87,18 @@
         public function excluir( int $id ) {
             $sql = "DELETE FROM {$this->nomeTabela} WHERE id = :id";
             $parametros['id'] = $id;
-            return $this->bancoDados->excluir($sql, $parametros);
+            $retorno = $this->bancoDados->excluir($sql, $parametros);
+            if( $retorno > 0 ){
+                return true;
+            }else{
+                throw new DAOException("O {$this->nomeTabela} não foi em encontrado para exclusão. Id: " . $id);
+            }
         }
 
         public function transformarEmObjetos(Array $corpo) {
             $objetos = [];
             foreach ($corpo as $dados) {
-                $objetos[] = $this->transformarEmObjeto($dados);
+                $objetos[] = $this->transformarEmObjeto( is_array( $dados ) ? $dados : [] );
             }
             return $objetos;
         }

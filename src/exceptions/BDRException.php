@@ -1,5 +1,5 @@
 <?php
-
-    class BDRException extends RuntimeException{
+    namespace customerapp\src\exceptions;
+    class BDRException extends \RuntimeException{
 
     }

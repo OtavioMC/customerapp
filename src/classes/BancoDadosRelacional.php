@@ -1,7 +1,7 @@
 <?php
     namespace customerapp\src\classes;
 
-    use BDRException;
+    use customerapp\src\exceptions\BDRException;
     use \PDO;
     use \PDOException;
     use customerapp\src\interfaces\BancoDados;
@@ -12,11 +12,11 @@
     class BancoDadosRelacional implements BancoDados, Singleton{
 
         private static $instancia;
-        private $host = "";
-        private $nomeBanco = "";
-        private $usuario = "";
-        private $senha = "";
-        private $conexaoPDO;
+        private string $host = "";
+        private string $nomeBanco = "";
+        private string $usuario = "";
+        private string $senha = "";
+        private ?PDO $conexaoPDO = null;
 
         private function __construct() {
             $this->host = $_ENV['DB_HOST'];

@@ -1,5 +1,5 @@
 <?php
-    
-    class DAOException extends Exception{
+    namespace customerapp\src\exceptions;
+    class DAOException extends \Exception{
 
     }

@@ -3,7 +3,7 @@
 
 
     class Roteador{
-        private $rotas = array();
+        private array $rotas = array();
 
 
         public function get($uri, $controller, $parametros = array()){
