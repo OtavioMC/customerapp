@@ -23,7 +23,8 @@
     },
     "scripts": {
         "test": "kahlan",
-        "analyze" : "php vendor/bin/phpstan analyse"
+        "analyze" : "php vendor/bin/phpstan analyse",
+        "phinx"   : "php vendor/bin/phinx"
     },
     "config": {
         "allow-plugins": {
