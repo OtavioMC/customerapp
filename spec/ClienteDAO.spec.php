@@ -20,11 +20,11 @@ describe('ClienteDAO', function () {
     it('Deve salvar adequadamente um cliente', function () {
         $cliente = new Cliente();
         $cliente->setId(0);
-        $cliente->setNome('João Silva Teste');
+        $cliente->setNome('Teste Silva Teste');
         $dataNascimentoTeste = "01/01/2001";
         $dataNascimentoTeste = new DateTime($dataNascimentoTeste);
         $cliente->setDataNascimento($dataNascimentoTeste);
-        $cliente->setEmail('joaosilvateste@gmail.com');
+        $cliente->setEmail('testesilvateste@gmail.com');
         $cliente->setCpf('000.000.000-00');
         $cliente->setSenha("123456");
 
@@ -49,7 +49,7 @@ describe('ClienteDAO', function () {
     it('Deve alterar um cliente devidamente', function () {
         $id = $this->idInserido[0];
         $cliente = $this->dao->buscarPorId($id);
-        $novoNome = "João Teste Jr.";
+        $novoNome = "Teste Teste Jr.";
         $novoEmail = "agoraeoutroteste@gmail.com";
         $novoCPF = "123.456.789-10";
         $novaDataNascimento = new DateTime("01/02/2023");

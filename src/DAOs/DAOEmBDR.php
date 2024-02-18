@@ -95,7 +95,7 @@
             }
         }
 
-        public function transformarEmObjetos(Array $corpo) {
+        public function transformarEmObjetos(array $corpo) {
             $objetos = [];
             foreach ($corpo as $dados) {
                 $objetos[] = $this->transformarEmObjeto( is_array( $dados ) ? $dados : [] );
@@ -103,7 +103,7 @@
             return $objetos;
         }
 
-        abstract public function transformarEmObjeto(Array $corpo);
+        abstract public function transformarEmObjeto(array $corpo);
 
         abstract protected function inserir($objeto);
 

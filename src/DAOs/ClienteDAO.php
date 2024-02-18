@@ -64,7 +64,7 @@
             if($linhasAlteradas >= 1){
                 return $cliente;
             }else{
-                throw new DAOException("Erro ao atualizar o cadastro do cliente. Id: " . $cliente->getId() );
+                throw new DAOException("Erro ao atualizar o cadastro. Id: " . $cliente->getId() );
             }
         }
     }

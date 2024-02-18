@@ -15,17 +15,16 @@ describe('ClienteService', function () {
 
     beforeAll(function () {
         $this->service = ClienteService::getInstancia();
-        $this->auxErros = array();
     });
 
     it('Deve passar um cliente na validação caso não haja nenhum problema', function () {
         $cliente = new Cliente();
         $cliente->setId(0);
-        $cliente->setNome('João Silva Teste');
+        $cliente->setNome('Teste Silva Teste');
         $dataNascimentoTeste = "01/01/2001";
         $dataNascimentoTeste = new DateTime($dataNascimentoTeste);
         $cliente->setDataNascimento($dataNascimentoTeste);
-        $cliente->setEmail('joaosilvateste@gmail.com');
+        $cliente->setEmail('testesilvateste@gmail.com');
         $cliente->setCpf('966.042.870-76');
         $cliente->setSenha("123456");
 
@@ -46,7 +45,6 @@ describe('ClienteService', function () {
             $cliente =  "";
             $erros = [];
             $this->service->validar( $cliente, $erros);
-            $this->auxErros[] = $erros;
         })->toThrow( new ServiceException() );
 
     });
@@ -60,7 +58,7 @@ describe('ClienteService', function () {
             $dataNascimentoTeste = "01/01/2001";
             $dataNascimentoTeste = new DateTime($dataNascimentoTeste);
             $cliente->setDataNascimento($dataNascimentoTeste);
-            $cliente->setEmail('joaosilvateste@gmail.com');
+            $cliente->setEmail('testesilvateste@gmail.com');
             $cliente->setCpf('966.042.870-76');
             $cliente->setSenha("123456");
             $this->service->validar( $cliente);
@@ -77,7 +75,7 @@ describe('ClienteService', function () {
             $dataNascimentoTeste = "01/12/9524";
             $dataNascimentoTeste = new DateTime($dataNascimentoTeste);
             $cliente->setDataNascimento($dataNascimentoTeste);
-            $cliente->setEmail('joaosilvateste@gmail.com');
+            $cliente->setEmail('testesilvateste@gmail.com');
             $cliente->setCpf('966.042.870-76');
             $cliente->setSenha("123456");
             $this->service->validar( $cliente);
@@ -95,7 +93,7 @@ describe('ClienteService', function () {
             $dataNascimentoTeste = "01/12/2000";
             $dataNascimentoTeste = new DateTime($dataNascimentoTeste);
             $cliente->setDataNascimento($dataNascimentoTeste);
-            $cliente->setEmail('joaosilvateste@!gmail.com');
+            $cliente->setEmail('testesilvateste@!gmail.com');
             $cliente->setCpf('966.042.870-76');
             $cliente->setSenha("123456");
             $this->service->validar( $cliente);
@@ -113,7 +111,7 @@ describe('ClienteService', function () {
             $dataNascimentoTeste = "01/12/2000";
             $dataNascimentoTeste = new DateTime($dataNascimentoTeste);
             $cliente->setDataNascimento($dataNascimentoTeste);
-            $cliente->setEmail('joaosilvateste@gmail.com');
+            $cliente->setEmail('testesilvateste@gmail.com');
             $cliente->setCpf('966.942.870-76');
             $cliente->setSenha("123456");
             $this->service->validar( $cliente);
@@ -129,7 +127,7 @@ describe('ClienteService', function () {
             $dataNascimentoTeste = "01/12/2000";
             $dataNascimentoTeste = new DateTime($dataNascimentoTeste);
             $cliente->setDataNascimento($dataNascimentoTeste);
-            $cliente->setEmail('joaosilvateste@gmail.com');
+            $cliente->setEmail('testesilvateste@gmail.com');
             $cliente->setCpf('96604287076');
             $cliente->setSenha("123456");
             $this->service->validar( $cliente);
@@ -142,11 +140,11 @@ describe('ClienteService', function () {
         expect(function(){
             $cliente = new Cliente();
             $cliente->setId(0);
-            $cliente->setNome('João Silva Teste');
+            $cliente->setNome('Teste Silva Teste');
             $dataNascimentoTeste = "01/01/2001";
             $dataNascimentoTeste = new DateTime($dataNascimentoTeste);
             $cliente->setDataNascimento($dataNascimentoTeste);
-            $cliente->setEmail('joaosilvateste@gmail.com');
+            $cliente->setEmail('testesilvateste@gmail.com');
             $cliente->setCpf('966.042.870-76');
             $cliente->setSenha("123");
             $this->service->validar( $cliente);
