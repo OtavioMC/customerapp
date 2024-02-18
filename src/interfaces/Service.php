@@ -9,5 +9,5 @@
         public function excluir( int $id );
         public function transformarEmObjetos( Array $corpo );
         public function transformarEmObjeto( Array $corpo );
-        public function validar( $objeto );
+        public function validar( $objeto, array &$erros = []);
     }

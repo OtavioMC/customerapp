@@ -10,7 +10,8 @@ abstract class ControllerGeral implements Controller, Singleton{
 
     protected function __construct() {
         $nomeClasseService = str_replace('Controller', '' , get_class($this) ) . "Service";
-        $this->service = call_user_func( $nomeClasseService . "::getInstancia()");
+        $nomeClasseService = str_replace( "controllers", "services", $nomeClasseService );
+        $this->service = $nomeClasseService::getInstancia();
     }
 
     abstract public static function getInstancia();

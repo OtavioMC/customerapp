@@ -4,13 +4,15 @@ namespace customerapp\src\services;
 
 use customerapp\src\interfaces\Service;
 use customerapp\src\interfaces\Singleton;
+use customerapp\src\DAOs\ClienteDAO;
 
 abstract class ServiceGeral implements Service, Singleton{
     protected $dao;
 
     protected function __construct() {
-        $nomeClasseDAO = str_replace('Service', '' , get_class($this) ) . "DAO";
-        $this->dao = call_user_func( $nomeClasseDAO . "::getInstancia()");
+        $nomeClasseDAO = str_replace('Service', '' , $this::class ) . "DAO";
+        $nomeClasseDAO = str_replace("services", "DAOs", $nomeClasseDAO );
+        $this->dao = $nomeClasseDAO::getInstancia();
     }
 
     abstract public static function getInstancia();
@@ -40,5 +42,5 @@ abstract class ServiceGeral implements Service, Singleton{
         return $this->dao->transformarEmObjeto($corpo);
     }
 
-    abstract public function validar( $objeto );
+    abstract public function validar( $objeto, array &$erros = []);
 }
