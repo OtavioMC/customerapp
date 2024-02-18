@@ -2,6 +2,7 @@
 
     namespace customerapp\src\controllers;
 
+    use customerapp\src\exceptions\ControllerException;
     use customerapp\src\interfaces\Controller;
     use customerapp\src\interfaces\Singleton;
 
@@ -24,21 +25,38 @@
             return $this->service->buscarTodos( $parametros, $pagina, $itensPorPagina);
         }
 
-        public function salvar($objeto) {
-            return $this->service->salvar($objeto);
+        public function salvar($objeto, &$erros = []) {
+            return $this->service->salvar($objeto, $erros);
         }
 
         public function excluir($id) {
             return $this->service->excluir($id);
         }
 
-        public function transformarEmObjetos(Array $corpo) {
+        public function transformarEmObjetos(array $corpo) {
             return $this->service->transformarEmObjetos($corpo);
         }
 
-        public function transformarEmObjeto(Array $corpo) {
+        public function transformarEmObjeto(array $corpo) {
             return $this->service->transformarEmObjeto($corpo);
         }
 
-        abstract public function criar( Array $corpo );
+        abstract public function criar( array $corpo, array &$erros = [] );
+
+        public function verificarEnvio( array $corpo, array $camposPadroes ){
+            foreach( $camposPadroes as $campoPadrao ){
+                if( ! array_key_exists($campoPadrao, $corpo) ){
+                    throw new ControllerException( "O " . $campoPadrao . " não foi enviado!" );
+                }
+            }
+        }
+
+        public function regularizarEnvio( array $corpo ): array{
+            $novoCorpo = array();
+            foreach( $corpo as $campo => $valor ){
+                $novoCorpo[$campo] = $this->service->regularizarCampo( $valor );
+            }
+            return $novoCorpo;
+        }
+
     }

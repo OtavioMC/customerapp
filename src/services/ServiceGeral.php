@@ -25,8 +25,8 @@
             return $this->dao->buscarTodos( $parametros, $pagina, $itensPorPagina);
         }
 
-        public function salvar($objeto) {
-            $this->validar($objeto);
+        public function salvar($objeto, &$erros = [] ) {
+            $this->validar($objeto, $erros);
             return $this->dao->salvar($objeto);
         }
 
@@ -34,13 +34,24 @@
             return $this->dao->excluir($id);
         }
 
-        public function transformarEmObjetos(Array $corpo) {
+        public function transformarEmObjetos(array $corpo) {
             return $this->dao->transformarEmObjetos($corpo);
         }
 
-        public function transformarEmObjeto(Array $corpo) {
+        public function transformarEmObjeto(array $corpo) {
             return $this->dao->transformarEmObjeto($corpo);
         }
+
+          public function regularizarCampo($campo) {
+            if (is_array($campo)) {
+              return array_map(  [$this, 'regularizarCampo'], $campo);
+            } elseif (is_object($campo)) {
+              $data = serialize($campo);
+              return unserialize($data, ['allowed_classes' => [$campo::class]]);
+            } else {
+              return htmlspecialchars($campo, ENT_QUOTES, 'UTF-8');
+            }
+          }
 
         abstract public function validar( $objeto, array &$erros = []);
     }
