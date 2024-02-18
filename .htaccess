@@ -1,0 +1,7 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Redirecionar o ponto inicial para /src/index.php
+    RewriteRule ^index\.php$ src/index.php [L]
+</IfModule>

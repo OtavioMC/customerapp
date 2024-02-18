@@ -1,6 +1,7 @@
 <?php
     namespace customerapp\src\classes;
 
+    use customerapp\src\exceptions\RoteadorException;
 
     class Roteador{
         private array $rotas = array();
@@ -58,30 +59,113 @@
             return $this->rotas;
         }
 
-        public function rotear( $uri, $metodo, $parametros = array() ){
-            global $_;
-            foreach( $this->rotas as $rota ){
-                if( $uri == $rota['uri'] && strtoupper($metodo) == $rota['method'] ){
-                    require_once "/src/controllers/" . $rota['controller'] . '.php';
-                    $controladora = new $rota['controller'];
+        //TODO: Refatorar switch interno com métodos privados, criar classe de RespostaHttp .
+        public function rotear($uri, $metodo, $parametros = []){
 
-                    //TODO: Acertar o roteamento e as respostas http
-                    // if( $metodo == "GET" && preg_match('^/[a-zA-Z]+/[0-9]+$', $uri ) ){
-                    //     $id = explode("/", $uri)[2];
-                    //     global $objeto;
-                    //     $objeto = $controladora->obterComId( $id );
-                    // }else if( $metodo == "GET" ){
-                    //     global $objetos;
-                    //     $objetos = $controladora->obterTodos( $parametros );
-                    // }else if( $metodo == "POST" || $metodo == "PUT"){
-                    //     $objeto = $controladora->criar($_POST);
-                    //     return $controladora->salvar($objeto);
-                    // }else if( $metodo == "DELETE" && preg_match('^/[a-zA-Z]+/[0-9]+$', $uri ) ){
-                    //     $id = explode("/", $uri)[2];
-                    //     return $controladora->excluir($id);
-                    // }
+            if( $uri == "/" ){
+                return;
+            }
+
+            if( mb_substr($uri, -1, 1, 'UTF-8') == "/" ){
+                $uri = rtrim($uri, '/');
+            }
+
+            foreach ($this->rotas as $rota) {
+                $uriRegex = str_replace("/{id}", "(?:\/([0-9]+))?", $rota['uri']);
+
+                $metodo = strtoupper($metodo);
+                if (preg_match("#^{$uriRegex}$#", $uri) && $metodo == $rota['method']) {
+                    require_once "/src/controllers/" . $rota['controller'] . '.php';
+                    $controladora =  $rota['controller']::getInstancia();
+
+                    try {
+                        switch ($metodo) {
+                            case "GET":
+                                $id = isset(explode("/", $uri)[2]) ? explode("/", $uri)[2] : null;
+
+                                if (is_numeric($id)) {
+                                    $objeto = $controladora->buscarPorId($id);
+
+                                    if ($objeto !== null && method_exists($objeto, 'serializar')) {
+                                        $resposta = $objeto->serializar();
+                                        http_response_code(200);
+                                        echo json_encode($resposta);
+                                        exit;
+                                    } else {
+                                        $resposta = [];
+                                        http_response_code(200);
+                                        echo json_encode($resposta);
+                                        exit;
+                                    }
+                                } else {
+                                    $objetos = $controladora->buscarTodos($parametros);
+                                    $resposta = [];
+
+                                    foreach ($objetos as $objeto) {
+                                        if ( method_exists($objeto, 'serializar') ) {
+                                            $resposta[] = $objeto->serializar();
+                                        }
+                                    }
+
+                                    http_response_code(200);
+                                    echo json_encode($resposta);
+                                    exit;
+                                }
+
+                            case "POST":
+                                $retorno = $controladora->criar($_POST);
+                                http_response_code(200);
+                                echo json_encode($retorno);
+                                exit;
+
+                            case "PUT":
+                                $id = isset(explode("/", $uri)[2]) ? explode("/", $uri)[2] : null;
+
+                                if (!is_numeric($id)) {
+                                    $this->paginaHttp(404);
+                                }
+
+                                $objeto = $controladora->buscarPorId($id);
+
+                                if ($objeto === null) {
+                                    http_response_code(404);
+                                    throw new RoteadorException("Objeto não encontrado");
+                                }
+
+                                $_POST['id'] = $id;
+                                $objeto = $controladora->transformarEmObjeto($_POST);
+                                $retorno = $controladora->salvar($objeto);
+                                http_response_code(200);
+                                echo json_encode($retorno);
+                                exit;
+
+                            case "DELETE":
+                                $id = isset(explode("/", $uri)[2]) ? explode("/", $uri)[2] : null;
+                                if (!is_numeric($id)) {
+                                    http_response_code(404);
+                                    throw new RoteadorException("Registro não encontrado para a exclusão!");
+                                }
+                                $retorno = $controladora->excluir($id);
+
+                                echo json_encode($retorno);
+                                exit;
+                        }
+                    } catch (RoteadorException $e) {
+                        echo json_encode([
+                            "success" => false,
+                            "mensagem" => $e->getMessage(),
+                        ]);
+                        exit;
+                    } catch (\Exception $e) {
+                        echo json_encode([
+                            "success" => false,
+                            "mensagem" => "Erro ao processar requisição",
+                        ]);
+                        exit;
+                    }
                 }
             }
+
             $this->paginaHttp(404);
         }
 

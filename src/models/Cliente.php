@@ -3,7 +3,9 @@
 
     use DateTime;
 
-    class Cliente{
+    use customerapp\src\interfaces\Model;
+
+    class Cliente implements Model{
         private int $id = 0;
         private string $nome = "";
         private DateTime $dataNascimento;
@@ -60,5 +62,15 @@
 
         public function setSenha(string $senha){
             $this->senha = $senha;
+        }
+
+        public function serializar(): array{
+            return [
+                'id' => $this->id,
+                'nome' => $this->nome,
+                'dataNascimento' => $this->dataNascimento instanceof DateTime? $this->dataNascimento->format('d/m/Y') : "00/00/0000",
+                'email' => $this->email,
+                'cpf' => $this->cpf
+            ];
         }
     }

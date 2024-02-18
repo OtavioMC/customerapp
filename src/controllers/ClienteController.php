@@ -3,7 +3,6 @@
     namespace customerapp\src\controllers;
 
     use customerapp\src\exceptions\ControllerException;
-    use customerapp\src\models\Cliente;
 
     class ClienteController extends ControllerGeral{
         private static $instancia = null;
