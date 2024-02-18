@@ -68,7 +68,7 @@
             return [
                 'id' => $this->id,
                 'nome' => $this->nome,
-                'dataNascimento' => $this->dataNascimento instanceof DateTime? $this->dataNascimento->format('d/m/Y') : "00/00/0000",
+                'dataNascimento' => $this->dataNascimento->format('d/m/Y'),
                 'email' => $this->email,
                 'cpf' => $this->cpf
             ];
