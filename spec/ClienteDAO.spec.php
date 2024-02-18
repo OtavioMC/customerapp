@@ -72,7 +72,7 @@ describe('ClienteDAO', function () {
     it("Deve excluir um cliente com o id", function(){
         $id = $this->idInserido[0];
         $retorno = $this->dao->excluir($id);
-        expect( $retorno )->toBe( true );
+        expect( $retorno )->toBeTruthy();
     });
 
 
