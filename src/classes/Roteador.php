@@ -97,7 +97,7 @@
                                             echo json_encode($resposta);
                                             exit;
                                         }
-                                    }else if( is_string($ultimaPartePermitidaURI) ){
+                                    }else{
                                         $primeiraParteURI = isset(explode("/", $uri)[1]) ? explode("/", $uri)[1] : null;
                                         $nomeView = $ultimaPartePermitidaURI . "-" . $primeiraParteURI;
                                         $this->redirecionarParaView( $nomeView );

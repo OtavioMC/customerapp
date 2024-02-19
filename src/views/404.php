@@ -1,5 +1,11 @@
+<?php
+    require_once __DIR__ . "/../assets/header.html";
+
+?>
+
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 
 
     <head>
