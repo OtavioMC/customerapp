@@ -2,12 +2,13 @@
     namespace customerapp\src\classes;
 
     use customerapp\src\exceptions\RoteadorException;
+    use customerapp\src\controllers\ControllerGeral;
 
     class Roteador{
         private array $rotas = array();
 
 
-        public function get($uri, $controller, $parametros = array()){
+        public function get($uri, ControllerGeral $controller, $parametros = array()){
             $rota = [
                 "uri" => $uri,
                 "controller" => $controller,
@@ -71,31 +72,35 @@
             }
 
             foreach ($this->rotas as $rota) {
-                $uriRegex = str_replace("/{id}", "(?:\/([0-9]+))?", $rota['uri']);
-
                 $metodo = strtoupper($metodo);
+                $uriRegex = str_replace("/", "\/", str_replace("/{id}", "(?:\/([0-9]+))?", $rota['uri']) );
                 if (preg_match("#^{$uriRegex}$#", $uri) && $metodo == $rota['method']) {
-                    require_once "/src/controllers/" . $rota['controller'] . '.php';
-                    $controladora =  $rota['controller']::getInstancia();
+                    $controladora =   $rota['controller'];
 
                     try {
                         switch ($metodo) {
                             case "GET":
-                                $id = isset(explode("/", $uri)[2]) ? explode("/", $uri)[2] : null;
+                                $ultimaPartePermitidaURI = isset(explode("/", $uri)[2]) ? explode("/", $uri)[2] : null;
 
-                                if (is_numeric($id)) {
-                                    $objeto = $controladora->buscarPorId($id);
+                                if ( !empty( $ultimaPartePermitidaURI )){
+                                    if( is_numeric($ultimaPartePermitidaURI) ){
+                                        $objeto = $controladora->buscarPorId($ultimaPartePermitidaURI);
 
-                                    if ($objeto !== null && method_exists($objeto, 'serializar')) {
-                                        $resposta = $objeto->serializar();
-                                        http_response_code(200);
-                                        echo json_encode($resposta);
-                                        exit;
-                                    } else {
-                                        $resposta = [];
-                                        http_response_code(200);
-                                        echo json_encode($resposta);
-                                        exit;
+                                        if ($objeto !== null && method_exists($objeto, 'serializar')) {
+                                            $resposta = $objeto->serializar();
+                                            http_response_code(200);
+                                            echo json_encode($resposta);
+                                            exit;
+                                        } else {
+                                            $resposta = [];
+                                            http_response_code(404);
+                                            echo json_encode($resposta);
+                                            exit;
+                                        }
+                                    }else if( is_string($ultimaPartePermitidaURI) ){
+                                        $primeiraParteURI = isset(explode("/", $uri)[1]) ? explode("/", $uri)[1] : null;
+                                        $nomeView = $ultimaPartePermitidaURI . "-" . $primeiraParteURI;
+                                        $this->redirecionarParaView( $nomeView );
                                     }
                                 } else {
                                     $objetos = $controladora->buscarTodos($parametros);
@@ -122,7 +127,7 @@
                                 $id = isset(explode("/", $uri)[2]) ? explode("/", $uri)[2] : null;
 
                                 if (!is_numeric($id)) {
-                                    $this->paginaHttp(404);
+                                    $this->redirecionarParaView(404);
                                 }
 
                                 $objeto = $controladora->buscarPorId($id);
@@ -166,12 +171,15 @@
                 }
             }
 
-            $this->paginaHttp(404);
+            $this->redirecionarParaView(404);
         }
 
-        public function paginaHttp( $codigo ){
-            http_response_code( (int)$codigo );
+        public function redirecionarParaView( $codigo, $ehHttp = true ){
+            if($ehHttp){
+                http_response_code( (int)$codigo );
+            }
             require_once  __DIR__ . "/../views/" . $codigo . ".php";
+            exit;
         }
 
 
