@@ -8,4 +8,4 @@
 
 4 - Utilizando o .env.example como referência, crie na raiz do seu projeto um arquivo '.env', preenchendo as variáveis com os devidos valores;
 
-5 - Rode npm i --dev para atualizar as dependências do package.json
+5 - Rode a migração com "phinx migrate"
