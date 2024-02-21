@@ -32,7 +32,10 @@
                 $this->validarDataNascimento($cliente->getDataNascimento(), $erros);
                 $this->validarEmail($cliente->getEmail(), $erros);
                 $this->validarCpf($cliente->getCpf(), $erros);
-                $this->validarSenha($cliente->getSenha(), $erros);
+
+                if( $cliente->getId() == 0 || ! empty ($cliente->getSenha() ) ){
+                    $this->validarSenha($cliente->getSenha(), $erros);
+                }
 
                 if( ! empty( $erros ) ){
 
@@ -154,6 +157,9 @@
         private function validarSenha($senha, &$erros) {
             if (strlen($senha) < 6) {
                 $erros["senha"] = "A senha deve ter no mínimo 6 caracteres.";
+            }
+            if (strlen($senha) > 20) {
+                $erros["senha"] = "A senha deve ter no máximo 20 caracteres.";
             }
         }
     }

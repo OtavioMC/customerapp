@@ -3,6 +3,7 @@
     namespace customerapp\src\controllers;
 
     use customerapp\src\exceptions\ControllerException;
+    use customerapp\src\exceptions\ServiceException;
 
     class ClienteController extends ControllerGeral{
         private static $instancia = null;
@@ -29,9 +30,11 @@
                 return  $this->salvar($cliente, $erros);
 
             }catch( ControllerException $e ){
-                throw $e;
-            }catch( \Exception $e ){
                 throw new ControllerException( "Erro ao criar cliente. " . $e->getMessage()  );
+            }catch( ServiceException $e ){
+                throw new ControllerException( "Erro ao criar cliente. " . $e->getMessage()  );
+            } catch( \Exception $e ){
+                throw $e;
             }
         }
 

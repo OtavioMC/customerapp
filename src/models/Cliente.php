@@ -68,7 +68,7 @@
             return [
                 'id' => $this->id,
                 'nome' => $this->nome,
-                'dataNascimento' => $this->dataNascimento->format('d/m/Y'),
+                'data_nascimento' => $this->dataNascimento->format('d/m/Y'),
                 'email' => $this->email,
                 'cpf' => $this->cpf
             ];
