@@ -17,12 +17,15 @@
 
     //Rotas para view
     $roteador->get("/clientes/registrar", ClienteController::getInstancia());
+    $roteador->get("/clientes/listar", ClienteController::getInstancia());
 
     // <==== Fim rotas para Clientes.
 
     $url = parse_url( $_SERVER['REQUEST_URI'] );
 
     $uri = $url['path'] ?? "/";
-    $parametros = $url['query'] ?? [];
+    $parametros = array();
+    $query = $url['query'] ?? "";
+    parse_str($query, $parametros);
     $metodo = $_POST["_METHOD"] ?? $_SERVER['REQUEST_METHOD'];
     $roteador->rotear($uri, $metodo, $parametros );

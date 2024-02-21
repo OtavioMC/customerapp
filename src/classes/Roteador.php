@@ -3,6 +3,7 @@
 
     use customerapp\src\exceptions\RoteadorException;
     use customerapp\src\controllers\ControllerGeral;
+use customerapp\src\exceptions\ControllerException;
 
     class Roteador{
         private array $rotas = array();
@@ -62,6 +63,7 @@
 
         //TODO: Refatorar switch interno com métodos privados, criar classe de RespostaHttp .
         public function rotear($uri, $metodo, $parametros = []){
+            global $_;
 
             if( $uri == "/" ){
                 return;
@@ -73,7 +75,7 @@
 
             foreach ($this->rotas as $rota) {
                 $metodo = strtoupper($metodo);
-                $uriRegex = str_replace("/", "\/", str_replace("/{id}", "(?:\/([0-9]+))?", $rota['uri']) );
+                $uriRegex = str_replace("/", "\/", str_replace("/{id}", "(?:/([0-9]+))?", $rota['uri']) );
                 if (preg_match("#^{$uriRegex}$#", $uri) && $metodo == $rota['method']) {
                     $controladora =   $rota['controller'];
 
@@ -100,34 +102,57 @@
                                     }else{
                                         $primeiraParteURI = isset(explode("/", $uri)[1]) ? explode("/", $uri)[1] : null;
                                         $nomeView = $ultimaPartePermitidaURI . "-" . $primeiraParteURI;
-                                        $this->redirecionarParaView( $nomeView );
-                                    }
-                                } else {
-                                    $objetos = $controladora->buscarTodos($parametros);
-                                    $resposta = [];
-
-                                    foreach ($objetos as $objeto) {
-                                        if ( method_exists($objeto, 'serializar') ) {
-                                            $resposta[] = $objeto->serializar();
+                                        if($ultimaPartePermitidaURI != "listar"){
+                                            $this->redirecionarParaView( $nomeView );
+                                        }else{
+                                            global $objetos;
+                                            $objetos = $controladora->buscarTodos($parametros);
+                                            http_response_code(200);
+                                            $this->redirecionarParaView($nomeView);
+                                            exit;
                                         }
                                     }
-
+                                } else {
+                                    global $objetos;
+                                    $objetos = $controladora->buscarTodos($parametros);
+                                    $primeiraParteURI = isset(explode("/", $uri)[1]) ? explode("/", $uri)[1] : null;
+                                    $nomeView = "listar-" . $primeiraParteURI;
                                     http_response_code(200);
-                                    echo json_encode($resposta);
+                                    $this->redirecionarParaView($nomeView);
                                     exit;
                                 }
 
                             case "POST":
-                                $retorno = $controladora->criar($_POST);
-                                http_response_code(200);
-                                echo json_encode($retorno);
+                                //TODO: melhorar lançamento de erro para CPF e Email duplicados, adicionando verificações na DAO.
+                                try{
+                                    $objeto = $controladora->criar($_POST);
+                                }catch(ControllerException $e){
+                                    throw new RoteadorException($e->getMessage());
+                                }catch( \Exception $e ){
+                                    http_response_code(500);
+                                    echo json_encode("CPF ou Email ja cadastrados!");
+                                    exit;
+                                }
+
+                                if ($objeto !== null && method_exists($objeto, 'serializar')) {
+                                    $resposta = $objeto->serializar();
+                                    http_response_code(200);
+                                    echo json_encode($resposta);
+                                    exit;
+                                } else {
+                                    $resposta = [];
+                                    http_response_code(500);
+                                    echo json_encode($resposta);
+                                    exit;
+                                }
                                 exit;
 
                             case "PUT":
                                 $id = isset(explode("/", $uri)[2]) ? explode("/", $uri)[2] : null;
 
                                 if (!is_numeric($id)) {
-                                    $this->redirecionarParaView(404);
+                                    http_response_code(404);
+                                    throw new RoteadorException("Id não encontrado");
                                 }
 
                                 $objeto = $controladora->buscarPorId($id);
@@ -137,12 +162,18 @@
                                     throw new RoteadorException("Objeto não encontrado");
                                 }
 
-                                $_POST['id'] = $id;
-                                $objeto = $controladora->transformarEmObjeto($_POST);
-                                $retorno = $controladora->salvar($objeto);
-                                http_response_code(200);
-                                echo json_encode($retorno);
-                                exit;
+
+                                if( isset($_POST) ){
+                                    $_POST['id'] = $id;
+                                    $objeto = $controladora->transformarEmObjeto($_POST);
+                                    $retorno = $controladora->salvar($objeto);
+                                    http_response_code(200);
+                                    echo json_encode($retorno);
+                                    exit;
+                                }else{
+                                    http_response_code(404);
+                                    throw new RoteadorException("Dados enviados incorretamente!");
+                                }
 
                             case "DELETE":
                                 $id = isset(explode("/", $uri)[2]) ? explode("/", $uri)[2] : null;
@@ -156,21 +187,15 @@
                                 exit;
                         }
                     } catch (RoteadorException $e) {
-                        echo json_encode([
-                            "success" => false,
-                            "mensagem" => $e->getMessage(),
-                        ]);
+                        http_response_code(400);
+                        echo $e->getMessage();
                         exit;
                     } catch (\Exception $e) {
-                        echo json_encode([
-                            "success" => false,
-                            "mensagem" => "Erro ao processar requisição",
-                        ]);
+                        $this->redirecionarParaView(500);
                         exit;
                     }
                 }
             }
-
             $this->redirecionarParaView(404);
         }
 
