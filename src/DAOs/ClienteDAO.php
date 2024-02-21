@@ -17,7 +17,7 @@
             return self::$instancia;
         }
 
-        private function parametros(Cliente $cliente) {
+        protected function parametros($cliente) {
             return [
                 'id'   => $cliente->getId(),
                 'nome' => $cliente->getNome(),
@@ -25,6 +25,16 @@
                 'email' => $cliente->getEmail(),
                 'cpf' => $cliente->getCpf(),
                 'senha' => password_hash( $cliente->getSenha(), PASSWORD_BCRYPT)
+            ];
+        }
+
+        protected function camposValidosConsulta(): array{
+            return [
+                'id',
+                'nome',
+                'data_nascimento',
+                'email',
+                'cpf'
             ];
         }
 
@@ -52,14 +62,20 @@
         }
 
         protected function atualizar($cliente) {
+            $mudarASenha = "";
+            if( ! empty( $cliente->getSenha()  )  ) {
+                $mudarASenha = ", senha = :senha ";
+            }
             $sql = "UPDATE {$this->nomeTabela} SET
                         nome = :nome,
                         data_nascimento = :data_nascimento,
                         email = :email,
-                        cpf = :cpf,
-                        senha = :senha
+                        cpf = :cpf" .$mudarASenha. "
                         WHERE id = :id";
             $parametros = $this->parametros($cliente);
+            if( empty( $mudarASenha ) ){
+                unset($parametros['senha']);
+            }
             $linhasAlteradas = $this->bancoDados->atualizar($sql, $parametros);
             if($linhasAlteradas >= 1){
                 return $cliente;

@@ -31,22 +31,31 @@
 
         public function buscarTodos( array $parametros = [], int $pagina = 1, int $itensPorPagina = null ) {
             $sql = "SELECT * FROM {$this->nomeTabela}";
-
+            $parametrosParaConsulta = [];
             if ( ! empty( $parametros ) ) {
-                $sql .= " WHERE ";
-                $condicoes = [];
-                foreach ($parametros as $coluna => $valor) {
-                    $condicoes[] = "$coluna = :$coluna";
+                $jaAdicionouWhere = false;
+                if( count($parametros) <= 30){ //limitando quantidade de parametros possiveis por segurança
+                    $condicoes = [];
+                    foreach($parametros as $coluna => $valor){
+                        if( in_array( $coluna, $this->camposValidosConsulta() ) ){
+                            $sql .= $jaAdicionouWhere ? "" : " WHERE ";
+                            $jaAdicionouWhere = true;
+                            $parametrosParaConsulta[$coluna] = $valor;
+                            $condicoes[] = "$coluna = :$coluna";
+                        }
+                    }
+                    $sql .= implode(" AND ", $condicoes);
                 }
-                $sql .= implode(" AND ", $condicoes);
             }
+
+            $sql .= " ORDER BY id DESC";
 
             if( $itensPorPagina != null ){
                 $inicio = ($pagina - 1) * $itensPorPagina;
                 $sql .= " LIMIT $inicio, $itensPorPagina";
             }
-
-            return $this->transformarEmObjetos($this->bancoDados->buscar($sql, $parametros));
+            // dd($sql, $parametrosParaConsulta);
+            return $this->transformarEmObjetos($this->bancoDados->buscar($sql, $parametrosParaConsulta));
         }
 
         public function existeComId( int $id ){
@@ -108,4 +117,8 @@
         abstract protected function inserir($objeto);
 
         abstract protected function atualizar($objeto);
+
+        abstract protected function parametros($objeto);
+
+        abstract protected function camposValidosConsulta() : array;
     }
