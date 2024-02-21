@@ -1,6 +1,6 @@
 ## Instalação
 
-1 - Dependências de versões: PHP > 8.2, MySQL >= 5.5, Composer >= 2.6^, npm  >= 10.1
+1 - Dependências de versões: PHP > 8.2, MySQL >= 5.5, Composer >= 2.6
 
 2 - No seu terminal local, rode "composer install" para baixar e configurar as dependências de desenvolvimento do projeto
 
