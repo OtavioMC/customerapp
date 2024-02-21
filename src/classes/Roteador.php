@@ -145,7 +145,6 @@ use customerapp\src\exceptions\ControllerException;
                                     echo json_encode($resposta);
                                     exit;
                                 }
-                                exit;
 
                             case "PUT":
                                 $id = isset(explode("/", $uri)[2]) ? explode("/", $uri)[2] : null;
@@ -161,20 +160,12 @@ use customerapp\src\exceptions\ControllerException;
                                     http_response_code(404);
                                     throw new RoteadorException("Objeto não encontrado");
                                 }
-
-
-                                if( isset($_POST) ){
-                                    $_POST['id'] = $id;
-                                    $objeto = $controladora->transformarEmObjeto($_POST);
-                                    $retorno = $controladora->salvar($objeto);
-                                    http_response_code(200);
-                                    echo json_encode($retorno);
-                                    exit;
-                                }else{
-                                    http_response_code(404);
-                                    throw new RoteadorException("Dados enviados incorretamente!");
-                                }
-
+                                $_POST['id'] = $id;
+                                $objeto = $controladora->transformarEmObjeto($_POST);
+                                $retorno = $controladora->salvar($objeto);
+                                http_response_code(200);
+                                echo json_encode($retorno);
+                                exit;
                             case "DELETE":
                                 $id = isset(explode("/", $uri)[2]) ? explode("/", $uri)[2] : null;
                                 if (!is_numeric($id)) {
